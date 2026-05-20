@@ -178,6 +178,51 @@ Output: 29,527,941
 FINAL ANSWER
 Texas population is approximately 75.3% of California
 
+## 🗺️ Roadmap - What's Coming
+
+### ✅ Phase 0-3: Complete (15+ projects)
+- Foundation (LLM wrapper, validation)
+- Single-Step Agents (routing, calculator, RAG)
+- Multi-Step Reasoning (pipeline, planning, reflection)
+- Graph Orchestration (LangGraph, routing, ReAct, HITL)
+
+### 🔜 Phase 4: Multi-Agent Systems (In Progress)
+
+| Project | Concept | Status |
+|---------|---------|--------|
+| 4.1 | Supervisor Agent - Coordinates multiple agents | 📝 Planning |
+| 4.2 | Agent Handoff - Pass context between agents | 📝 Planning |
+| 4.3 | Shared Memory - Agents remember across handoffs | 📝 Planning |
+| 4.4 | Collaborative Agents - Debate & consensus | 📝 Planning |
+
+### 🔜 Phase 5: MCP Integration (Model Context Protocol)
+
+| Project | Concept | Status |
+|---------|---------|--------|
+| 5.1 | MCP Server - Build a tool server | 📋 Planned |
+| 5.2 | Tool Registry - Dynamic tool discovery | 📋 Planned |
+| 5.3 | MCP Client Agent - Discover + use tools | 📋 Planned |
+| 5.4 | Cross-Agent MCP - Multi-agent tool sharing | 📋 Planned |
+
+### 🔜 Phase 6: Production Readiness
+
+| Project | Concept | Status |
+|---------|---------|--------|
+| 6.1 | Streaming Responses - Real-time thinking | 📋 Planned |
+| 6.2 | Checkpointing - Pause/resume agents | 📋 Planned |
+| 6.3 | Human Approval Dashboard - UI for HITL | 📋 Planned |
+| 6.4 | Agent Observability - Metrics & logging | 📋 Planned |
+| 6.5 | Multi-modal Agents - Image + audio inputs | 🔮 Vision |
+
+---
+
+## 📅 Update Frequency
+
+- **Weekly updates** - New projects added every week
+- **GitHub stars** ⭐ - Help me prioritize what to build next
+- **Issues & PRs** - Your feedback shapes the roadmap
+
+**Follow this repo to get notified about new projects!**
 
  🤝 Who Is This For?
 
