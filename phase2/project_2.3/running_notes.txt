@@ -1,0 +1,75 @@
+Reflection Agent (Self-Critiquing Agent)
+This project is one of the BIG turning points in Agentic AI.
+
+Until now your agents were: Input → Generate → Return
+
+Now we evolve into:
+Input
+ → Generate Draft
+ → Critique Draft
+ → Improve Draft
+ → Return Final
+
+What You’re Learning Here
+
+You are now implementing:
+
+* self-reflection
+* self-critique
+* iterative refinement
+* answer improvement loops
+* evaluator/generator architecture
+
+This is used in:
+
+* OpenAI deep research systems
+* Devin-style agents
+* Claude reasoning systems
+* AutoGen reflection workflows
+* LangGraph evaluator loops
+* self-correcting RAG pipelines
+
+The Core Idea
+
+Instead of trusting:
+first answer = best answer
+
+we teach the agent:
+"analyze your own mistakes"
+This is one of the biggest concepts in modern agent systems.
+
+Mental Model
+Think of this as:
+Writer Agent
+    ↓
+Reviewer Agent
+    ↓
+Editor Agent
+
+ALL powered by the SAME LLM.
+
+Different prompts = different “roles”.
+
+VERY important realization.
+
+Architecture
+User Question
+      ↓
+Generate Initial Answer
+      ↓
+Critique Initial Answer
+      ↓
+Identify Weaknesses
+      ↓
+Generate Improved Answer
+      ↓
+Return Final Response
+
+Folder Structure
+phase2/
+└── project_2.3/
+    ├── main.py
+    ├── reflection_agent.py
+    ├── prompts.py
+    ├── logger.py
+    └── sample_questions.txt

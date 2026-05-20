@@ -1,0 +1,116 @@
+Project 3.1 — Your FIRST LangGraph Agent
+
+This is a MAJOR milestone.
+
+You are now transitioning from:
+manual orchestration
+to
+
+graph-based cognitive orchestration
+
+But real agent systems need:
+* branching
+* loops
+* retries
+* memory
+* state tracking
+* conditional execution
+* multi-agent coordination
+
+
+This becomes NIGHTMARE with plain Python flow.
+So LangGraph introduces:
+graph orchestration
+
+stateful think → act graph
+VERY small.
+VERY important.
+
+
+What You Will Learn
+
+You will understand:
+
+* graph nodes
+* graph edges
+* shared state
+* node execution
+* state transitions
+* orchestration architecture
+
+
+LangGraph is:
+a state machine for AI cognition
+That is the correct mental model.
+
+Now: Node → Shared State → Node → Shared State
+
+Architecture
+User Question
+      ↓
+[ THINK NODE ]
+Decides what to do
+      ↓
+[ ACT NODE ]
+Executes response
+      ↓
+Final Output
+
+
+phase3/
+└── project_3.1/
+    ├── main.py
+    ├── graph_agent.py
+    ├── state.py
+    ├── nodes.py
+    ├── logger.py
+    └── prompts.py
+
+
+
+Node
+Unit of cognition
+
+State
+Shared memory
+
+Edge
+Cognitive transition
+
+Graph
+Orchestrated reasoning system
+
+Invoke
+Execute cognitive workflow
+
+
+This is the foundation of:
+* autonomous agents
+* long workflows
+* multi-step systems
+* memory agents
+* tool agents
+* planning systems
+
+┌─────────────────────────────────────────────────────────────────┐
+│                        LANGGRAPH AGENT                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   ┌──────────────┐         ┌──────────────┐                    │
+│   │   THINK      │         │   ACTION     │                    │
+│   │   NODE       │────────▶│   NODE       │────────▶ END       │
+│   │              │         │              │                    │
+│   │ "Analyze     │         │ "Generate    │                    │
+│   │  user query" │         │  answer"     │                    │
+│   └──────┬───────┘         └──────────────┘                    │
+│          │                                                        │
+│          ▼                                                        │
+│   ┌──────────────────────────────────────────────┐              │
+│   │              SHARED STATE                      │              │
+│   │  {                                             │              │
+│   │    "user_query": "tell me about stars",       │              │
+│   │    "thought": "need to explain collapse...",  │              │
+│   │    "final_answer": "Stars form from gas..."   │              │
+│   │  }                                             │              │
+│   └──────────────────────────────────────────────┘              │
+└─────────────────────────────────────────────────────────────────┘

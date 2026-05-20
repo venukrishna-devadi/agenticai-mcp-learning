@@ -1,0 +1,800 @@
+Next you’ll build:
+
+iterative reasoning loops
+
+Meaning:
+Think
+→ Tool
+→ Observe
+→ Think again
+→ Another tool
+→ Final answer
+
+Now the agent becomes:
+
+adaptive
+
+instead of:
+single-shot
+
+That is where agents start feeling:
+autonomous.
+
+Project 3.4 is where your systems start becoming:
+
+genuinely agentic
+Until now:
+
+3.1
+Conditional routing
+
+3.2
+Structured state + Pydantic
+
+3.3
+Tool calling
+
+Project 3.4 - you’ll build:
+
+Iterative ReAct Agent Loop
+This is one of the MOST IMPORTANT architectures in all of Agentic AI.
+
+BIG IDEA OF PROJECT 3.4
+So far your agent worked like this: single-step reasoning
+User Question
+    ↓
+Think Once
+    ↓
+Use Tool
+    ↓
+Final Answer
+
+
+But real agents work like this:iterative reasoning
+Question
+   ↓
+Think
+   ↓
+Use Tool
+   ↓
+Observe Result
+   ↓
+Think Again
+   ↓
+Need Another Tool?
+   ↓
+Use Another Tool
+   ↓
+Observe Again
+   ↓
+Final Answer
+
+
+Why This Matters MASSIVELY
+
+Without loops:
+* agents are fragile
+* one-shot only
+* no adaptation
+* no recovery
+* no deeper reasoning
+
+With loops:
+* agents can investigate
+* agents can retry
+* agents can refine
+* agents can chain tools
+* agents become autonomous
+
+This is the foundation behind:
+* ChatGPT tool use
+* Claude tool use
+* Cursor
+* Devin
+* Manus
+* OpenAI Deep Research
+* AutoGPT
+* LangGraph production systems
+
+Your graph becomes:
+START
+   ↓
+Think Node
+   ↓
+Need Tool?
+ ┌───────────────┐
+ │ YES           │ NO
+ ↓               ↓
+Tool Node      Final Node
+ ↓
+Observation
+ ↓
+Think Again
+
+This creates a a reasoning cycle and NOT just input → output
+
+THIS is ReAct
+ReAct means: Reason + Act
+
+Paper introduced:
+Thought
+Action
+Observation
+Thought
+Action
+Observation
+Final Answer
+
+This was revolutionary because:
+* reasoning became dynamic
+* tools became integrated
+* AI could adapt mid-process
+
+Example of What Your Agent Will Soon Do
+User: What is the population of Texas divided by the population of California?
+Old Agent: hallucinates both numbers
+
+New Agent:
+Thought:
+I need real population data
+
+Action:
+search_web(Texas population)
+
+Observation:
+31 million
+
+Thought:
+Need California population
+
+Action:
+search_web(California population)
+
+Observation:
+39 million
+
+Thought:
+Now calculate ratio
+
+Action:
+calculator(31/39)
+
+Observation:
+0.794
+
+Final Answer:
+Texas population is ~79% of California
+
+IMPORTANT CONCEPT
+In Project 3.3:
+LLM decides tool once
+
+In Project 3.4: LLM continuously re-evaluates state
+Before: static workflow
+Now: dynamic workflow
+
+This is the beginning of: autonomous planning systems
+
+Another Major Industry Concept
+Project 3.4 introduces: stateful cognition
+
+Your agent now remembers:
+* previous thoughts
+* previous tools
+* observations
+* failures
+* intermediate results
+
+That is: working memory
+Exactly like human reasoning.
+
+Architecture You’ll Build
+State Schema
+
+You’ll now expand state significantly.
+Example:
+
+class AgentState(BaseModel):
+    user_query: str
+
+    current_thought: str = ""
+
+    need_tool: bool = False
+
+    selected_tool: str = ""
+
+    tool_input: str = ""
+
+    tool_output: str = ""
+
+    final_answer: str = ""
+
+    step_count: int = 0
+
+    history: list = []
+
+Why step_count Matters
+Without it: agent may loop forever
+
+VERY important real-world problem.
+Production agents ALWAYS need:
+* max iterations
+* loop guards
+* timeout protection
+
+
+Why history Matters
+History becomes: short-term memory
+
+Example:
+history = [
+   "Thought: Need population",
+   "Tool: web_search",
+   "Observation: Texas=31M"
+]
+
+Now future thoughts can use:
+* prior observations
+* prior reasoning
+* prior tool outputs
+
+This is: chain-of-thought memory persistence - VERY important.
+
+Core Flow of Project 3.4
+Think Node - LLM decides:
+
+* do I need a tool?
+* which tool?
+* what next?
+
+Outputs structured JSON:
+{
+  "need_tool": true,
+  "tool_name": "calculator",
+  "tool_input": "31 / 39",
+  "thought": "Need ratio calculation"
+}
+
+Tool node -> Executes tool -> Stores: tool_output -> Updates history.
+
+Observation Phase
+
+Now the model sees:
+* previous thought
+* tool output
+* history
+
+And decides:
+Do I continue?
+OR
+Do I answer?
+
+THIS is the key innovation.
+
+Conditional Looping Edge
+You’ll create something like:
+
+def should_continue(state):
+    if state.need_tool:
+        return "tool"
+    return "final"
+
+But AFTER tool: graph.add_edge("tool_node", "think_node")
+THIS creates:
+cyclic reasoning
+
+THIS is What Makes LangGraph Powerful
+Traditional pipelines: linear DAGs
+LangGraph:cyclic state machines
+
+That enables:
+* loops
+* retries
+* reflection
+* planning
+* memory
+* multi-agent coordination
+
+project_3.4/
+│
+├── main.py
+│
+├── schemas/
+│   ├── state.py
+│   └── decision_schema.py
+│
+├── nodes/
+│   ├── think_node.py
+│   ├── tool_node.py
+│   └── final_node.py
+│
+├── tools/
+│   ├── calculator_tool.py
+│   └── population_tool.py
+│
+├── prompts/
+│   └── think_prompt.py
+│
+└── utils/
+    └── helper.py
+
+
+📊 DIAGRAM 1: Core ReAct Loop Flow
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         PROJECT 3.4 - ReAct AGENT                            │
+│                      (Reasoning + Acting Loop)                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                                    START
+                                      │
+                                      ▼
+                        ┌─────────────────────────┐
+                        │     USER QUESTION       │
+                        │  "What is 31M / 39M?"   │
+                        └─────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           🧠 THINK NODE                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  • Analyzes user question                                                   │
+│  • Reviews history (past thoughts/actions)                                  │
+│  • Decides: Need tool? Which tool?                                          │
+│  • Outputs structured JSON:                                                │
+│    {                                                                        │
+│      "need_tool": true,                                                     │
+│      "tool_name": "calculator",                                             │
+│      "tool_input": "31 / 39",                                               │
+│      "thought": "Need to calculate ratio"                                   │
+│    }                                                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+                            ┌─────────────────┐
+                            │  need_tool?     │
+                            └─────────────────┘
+                                      │
+                    ┌─────────────────┴─────────────────┐
+                    │ YES                               │ NO
+                    ▼                                   ▼
+    ┌─────────────────────────────┐       ┌─────────────────────────┐
+    │         🔧 TOOL NODE         │       │      FINAL NODE         │
+    ├─────────────────────────────┤       ├─────────────────────────┤
+    │  • Executes selected tool   │       │  • Generate final answer │
+    │  • calculator(31 / 39)      │       │  • No more tools needed  │
+    │  • Returns: 0.794           │       └─────────────────────────┘
+    └─────────────────────────────┘                    │
+                    │                                   │
+                    ▼                                   ▼
+    ┌─────────────────────────────┐                 ┌─────┐
+    │      👁️ OBSERVE & RECORD    │                 │ END │
+    ├─────────────────────────────┤                 └─────┘
+    │  • Store tool_output        │
+    │  • Add to history           │
+    │  • Increment step_count     │
+    │  • Update state             │
+    └─────────────────────────────┘
+                    │
+                    │ (LOOP BACK)
+                    ▼
+            ┌─────────────────┐
+            │   THINK AGAIN    │ ◄─── CYCLE CONTINUES
+            └─────────────────┘        UNTIL need_tool = false
+
+
+
+
+📊 DIAGRAM 2: State Evolution Over Time
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         STATE EVOLUTION                                      │
+│                    (Working Memory Across Cycles)                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+INITIAL STATE:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ user_query: "Population of Texas / Population of California"                │
+│ step_count: 0                                                                │
+│ history: []                                                                  │
+│ need_tool: false                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                                    │
+                                    ▼
+
+AFTER CYCLE 1 (THINK → TOOL → OBSERVE):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ user_query: "Population of Texas / Population of California"                │
+│ step_count: 1                                                                │
+│ history: [                                                                   │
+│   {"thought": "Need Texas population", "tool": "search", "output": "31M"}   │
+│ ]                                                                            │
+│ need_tool: true  ← Still need California population                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                                    │
+                                    ▼
+
+AFTER CYCLE 2 (THINK → TOOL → OBSERVE):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ user_query: "Population of Texas / Population of California"                │
+│ step_count: 2                                                                │
+│ history: [                                                                   │
+│   {"thought": "Need Texas population", "tool": "search", "output": "31M"},  │
+│   {"thought": "Need California population", "tool": "search", "output": "39M"}│
+│ ]                                                                            │
+│ need_tool: true  ← Now need to calculate                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                                    │
+                                    ▼
+
+AFTER CYCLE 3 (THINK → TOOL → OBSERVE):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ user_query: "Population of Texas / Population of California"                │
+│ step_count: 3                                                                │
+│ history: [                                                                   │
+│   {...},                                                                     │
+│   {...},                                                                     │
+│   {"thought": "Need ratio", "tool": "calculator", "output": "0.794"}        │
+│ ]                                                                            │
+│ need_tool: false  ← Ready for final answer!                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                                    │
+                                    ▼
+
+FINAL STATE (After FINAL NODE):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ final_answer: "Texas population is ~79% of California"                      │
+│ step_count: 3                                                                │
+│ history: [All three steps]                                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+📊 DIAGRAM 3: LangGraph Architecture with Conditional Loop
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    LANGGRAPH - CYCLIC STATE MACHINE                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                              ┌─────────────────┐
+                              │   ENTRY POINT   │
+                              │   "think_node"  │
+                              └────────┬────────┘
+                                       │
+                                       ▼
+                              ┌─────────────────┐
+                              │   THINK_NODE    │
+                              │                 │
+                              │  • Set need_tool│
+                              │  • Set tool_name│
+                              │  • Set tool_input│
+                              └────────┬────────┘
+                                       │
+                                       ▼
+                            ┌─────────────────────┐
+                            │  CONDITIONAL EDGE   │
+                            │  tool_router()      │
+                            │                     │
+                            │  if need_tool:      │
+                            │    return "tool"    │
+                            │  else:              │
+                            │    return "final"   │
+                            └─────────┬───────────┘
+                                      │
+              ┌───────────────────────┴───────────────────────┐
+              │                                               │
+              ▼                                               ▼
+    ┌─────────────────┐                             ┌─────────────────┐
+    │   TOOL_NODE     │                             │   FINAL_NODE    │
+    │                 │                             │                 │
+    │  • Execute tool │                             │  • Generate     │
+    │  • Store output │                             │    final_answer │
+    │  • Update state │                             │  • End graph    │
+    └────────┬────────┘                             └────────┬────────┘
+              │                                               │
+              │ (LOOP BACK)                                   │
+              ▼                                               ▼
+    ┌─────────────────┐                             ┌─────────────────┐
+    │   THINK_NODE    │                             │      END        │
+    │   (AGAIN)       │                             │                 │
+    └─────────────────┘                             └─────────────────┘
+            
+            ⚠️ CRITICAL: Add max_iterations guard!
+            ┌─────────────────────────────────────────────────────────┐
+            │ if state.step_count > MAX_ITERATIONS:                   │
+            │     state.need_tool = false  # Force exit               │
+            │     state.final_answer = "Max steps reached"            │
+            └─────────────────────────────────────────────────────────┘
+
+
+
+📊 DIAGRAM 4: Comparison - Project 3.3 vs Project 3.4
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    LANGGRAPH - CYCLIC STATE MACHINE                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                              ┌─────────────────┐
+                              │   ENTRY POINT   │
+                              │   "think_node"  │
+                              └────────┬────────┘
+                                       │
+                                       ▼
+                              ┌─────────────────┐
+                              │   THINK_NODE    │
+                              │                 │
+                              │  • Set need_tool│
+                              │  • Set tool_name│
+                              │  • Set tool_input│
+                              └────────┬────────┘
+                                       │
+                                       ▼
+                            ┌─────────────────────┐
+                            │  CONDITIONAL EDGE   │
+                            │  tool_router()      │
+                            │                     │
+                            │  if need_tool:      │
+                            │    return "tool"    │
+                            │  else:              │
+                            │    return "final"   │
+                            └─────────┬───────────┘
+                                      │
+              ┌───────────────────────┴───────────────────────┐
+              │                                               │
+              ▼                                               ▼
+    ┌─────────────────┐                             ┌─────────────────┐
+    │   TOOL_NODE     │                             │   FINAL_NODE    │
+    │                 │                             │                 │
+    │  • Execute tool │                             │  • Generate     │
+    │  • Store output │                             │    final_answer │
+    │  • Update state │                             │  • End graph    │
+    └────────┬────────┘                             └────────┬────────┘
+              │                                               │
+              │ (LOOP BACK)                                   │
+              ▼                                               ▼
+    ┌─────────────────┐                             ┌─────────────────┐
+    │   THINK_NODE    │                             │      END        │
+    │   (AGAIN)       │                             │                 │
+    └─────────────────┘                             └─────────────────┘
+            
+            ⚠️ CRITICAL: Add max_iterations guard!
+            ┌─────────────────────────────────────────────────────────┐
+            │ if state.step_count > MAX_ITERATIONS:                   │
+            │     state.need_tool = false  # Force exit               │
+            │     state.final_answer = "Max steps reached"            │
+            └─────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              PROJECT 3.3 (Single-Shot Tool)                                 │
+│                        VS                                                    │
+│              PROJECT 3.4 (Iterative ReAct)                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+PROJECT 3.3 - STATIC (One and Done):
+═══════════════════════════════════════════════════════════════════════════════
+
+    START → THINK (once) → TOOL (once) → FINAL → END
+    
+    • No memory of past reasoning
+    • Cannot chain tools
+    • Cannot recover from errors
+    • Linear, predictable flow
+
+
+PROJECT 3.4 - DYNAMIC (Iterative Loop):
+═══════════════════════════════════════════════════════════════════════════════
+
+    START → THINK → TOOL → OBSERVE ──┐
+              ↑                      │
+              └──────────────────────┘ (loop until done)
+                                      │
+                                      ▼
+                                  FINAL → END
+    
+    • Remembers history
+    • Can chain multiple tools
+    • Can retry on errors
+    • Adaptive, autonomous flow
+
+
+
+📊 DIAGRAM 5: The ReAct Pattern (Thought → Action → Observation)
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         THE ReAct PATTERN                                    │
+│              (Reasoning + Acting = ReAct)                                   │
+│         From the paper: "ReAct: Synergizing Reasoning and Acting"          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                        
+        ┌─────────────────────────────────────────────────────────┐
+        │                                                         │
+        │    ┌─────────────┐      ┌─────────────┐               │
+        │    │   THOUGHT   │ ───▶ │   ACTION    │               │
+        │    │             │      │             │               │
+        │    │ "I need to  │      │ search_web  │               │
+        │    │  find Texas │      │ (Texas pop) │               │
+        │    │  population"│      │             │               │
+        │    └─────────────┘      └──────┬──────┘               │
+        │         ▲                      │                       │
+        │         │                      ▼                       │
+        │         │              ┌─────────────┐               │
+        │         │              │ OBSERVATION │               │
+        │         │              │             │               │
+        │         │              │ "31 million"│               │
+        │         │              └──────┬──────┘               │
+        │         │                      │                       │
+        │         └──────────────────────┘                       │
+        │                    (LOOP)                              │
+        │                                                         │
+        └─────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+                        ┌─────────────────────────┐
+                        │     FINAL ANSWER         │
+                        │  Synthesized from all    │
+                        │  thoughts + observations │
+                        └─────────────────────────┘
+
+
+EXAMPLE EXECUTION:
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Thought 1:  "I need to find Texas population"                               │
+│ Action 1:   search_web("Texas population")                                 │
+│ Observation 1: "31 million"                                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Thought 2:  "Now I need California population"                             │
+│ Action 2:   search_web("California population")                            │
+│ Observation 2: "39 million"                                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Thought 3:  "Now calculate ratio 31/39"                                    │
+│ Action 3:   calculator("31 / 39")                                          │
+│ Observation 3: "0.794"                                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ FINAL ANSWER: "Texas population is approximately 79% of California"        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+
+📊 DIAGRAM 6: State Schema for ReAct Agent
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         STATE SCHEMA - Project 3.4                          │
+│                    (Extended for Iterative Reasoning)                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+class AgentState(BaseModel):
+    ═══════════════════════════════════════════════════════════════════════════
+    
+    📝 INPUT FIELDS:
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │ user_query: str      # "What is 31M / 39M?"                            │
+    └─────────────────────────────────────────────────────────────────────────┘
+    
+    🧠 REASONING FIELDS:
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │ current_thought: str # "Need to calculate ratio"                       │
+    │ need_tool: bool       # true/false - should we use tool?               │
+    └─────────────────────────────────────────────────────────────────────────┘
+    
+    🔧 TOOL FIELDS:
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │ selected_tool: str   # "calculator", "search_web"                      │
+    │ tool_input: str      # "31 / 39"                                       │
+    │ tool_output: str     # "0.794"                                         │
+    └─────────────────────────────────────────────────────────────────────────┘
+    
+    💾 MEMORY FIELDS (NEW!):
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │ step_count: int      # 0, 1, 2, 3... (prevents infinite loops)        │
+    │ history: list = []   # [Thought1, Action1, Obs1, Thought2...]         │
+    │                      # ⚠️ CRITICAL: Working memory!                    │
+    └─────────────────────────────────────────────────────────────────────────┘
+    
+    📤 OUTPUT FIELD:
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │ final_answer: str    # "Texas is ~79% of California"                   │
+    └─────────────────────────────────────────────────────────────────────────┘
+
+
+EXAMPLE history FIELD Content:
+═══════════════════════════════════════════════════════════════════════════════
+
+history = [
+    {"step": 1, "type": "thought", "content": "Need Texas population"},
+    {"step": 1, "type": "action", "content": "search_web(Texas)"},
+    {"step": 1, "type": "observation", "content": "31 million"},
+    
+    {"step": 2, "type": "thought", "content": "Need California population"},
+    {"step": 2, "type": "action", "content": "search_web(California)"},
+    {"step": 2, "type": "observation", "content": "39 million"},
+    
+    {"step": 3, "type": "thought", "content": "Calculate ratio"},
+    {"step": 3, "type": "action", "content": "calculator(31/39)"},
+    {"step": 3, "type": "observation", "content": "0.794"}
+]
+
+
+
+
+📊 DIAGRAM 7: Loop Guard / Safety Mechanism
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    LOOP GUARD - Prevent Infinite Loops                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                    ┌─────────────────────────────────────┐
+                    │         THINK NODE                  │
+                    │                                     │
+                    │  if state.step_count > MAX_STEPS:  │
+                    │      state.need_tool = false       │
+                    │      state.final_answer =          │
+                    │        "Max iterations reached"    │
+                    │      return state                  │
+                    └─────────────────────────────────────┘
+                                      │
+                                      ▼
+                    ┌─────────────────────────────────────┐
+                    │         TOOL NODE                   │
+                    │                                     │
+                    │  state.step_count += 1              │
+                    │  # Increment on each tool use       │
+                    └─────────────────────────────────────┘
+
+
+EXAMPLE: Without Loop Guard
+═══════════════════════════════════════════════════════════════════════════════
+    Thought: "I need more data"
+    Action: search()
+    Observation: "No result"
+    Thought: "I need more data"  ← REPEATS FOREVER!
+    Action: search()              ← INFINITE LOOP!
+    Observation: "No result"
+    ... (never ends)
+
+
+EXAMPLE: With Loop Guard (MAX_STEPS = 5)
+═══════════════════════════════════════════════════════════════════════════════
+    Step 1: search() → no result
+    Step 2: search() → no result
+    Step 3: search() → no result
+    Step 4: search() → no result
+    Step 5: search() → no result
+    Step 6: need_tool = false, force exit with "Max steps reached"
+
+
+# PROJECT 3.4 - Iterative ReAct Agent
+
+## Key Concepts:
+1. **ReAct = Reasoning + Acting** (from the paper)
+2. **Loop, not linear** - agent can think multiple times
+3. **Working memory** - history field stores past steps
+4. **Loop guards** - prevent infinite loops (MAX_STEPS)
+5. **Dynamic decision making** - agent decides when to stop
+
+## Three Node Types:
+- **Think Node**: Decides what to do next (JSON output)
+- **Tool Node**: Executes the action (calculator, search)
+- **Final Node**: Synthesizes final answer when done
+
+## The Loop:
+Think → Tool → Observe → Think → Tool → Observe → ... → Final
+
+## Critical State Additions:
+- `step_count`: Prevents infinite loops
+- `history`: Working memory across cycles
+
+## Why This Matters:
+- Foundation for ChatGPT, Claude, AutoGPT
+- Enables multi-step reasoning
+- Allows tool chaining
+- Makes agents truly autonomous
+
+
+LLM + MEMORY + TOOLS + REASONING LOOP + STATE MACHINE
+That combination is: modern agent architecture.
+
+LLMs are probabilistic reasoners, not deterministic calculators.
+Tools fix this.
+This is one of the MOST important lessons in Agentic AI.

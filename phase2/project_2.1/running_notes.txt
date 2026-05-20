@@ -1,0 +1,243 @@
+PHASE 2 — Multi-Step Reasoning Agents
+
+This is where agents start becoming truly intelligent.
+
+NEXT PROJECT
+
+Project 2.1 — Research Assistant Agent
+
+This will be your first:
+multi-step thinking agent
+
+Up until now:
+Question
+→ One Tool
+→ Answer
+
+Now:
+Question
+→ Multiple reasoning stages
+→ Intermediate outputs
+→ Validation
+→ Final answer
+
+
+
+WHAT YOU WILL BUILD
+
+A research assistant agent that:
+Reads a research abstract
+        ↓
+Extracts important claims
+        ↓
+Evaluates confidence
+        ↓
+Produces structured analysis
+
+WHAT NEW CONCEPTS YOU’LL LEARN
+
+⸻
+
+1. Multi-Step Reasoning
+
+Instead of:
+single-shot prompting
+the agent now thinks in stages.
+
+2. Intermediate State
+The output of Step 1 becomes input to Step 2.
+Critical concept.
+
+3. Agent Memory Flow
+The agent now maintains:
+working memory
+between steps.
+
+This is foundational for:
+
+* LangGraph
+* MCP
+* autonomous agents
+
+4. Decomposition
+The agent learns:
+big task
+
+→ smaller subtasks
+This is core agentic behavior.
+
+THE FLOW
+User gives abstract
+        ↓
+Step 1: Extract claims
+        ↓
+Step 2: Identify risks/limitations
+        ↓
+Step 3: Generate simplified explanation
+        ↓
+Final structured report
+
+THIS PROJECT IS IMPORTANT BECAUSE
+You stop treating the LLM like:
+one giant brain
+
+and start treating it like:
+a reasoning pipeline
+That’s the birth of true agents.
+
+WHAT YOU WILL REALIZE
+
+This project creates the foundation for:
+
+* planning agents
+* reflection agents
+* LangGraph nodes
+* MCP workflows
+* autonomous execution
+
+Because ALL of those are really:
+multi-step stateful reasoning systems
+
+now entering the phase where agents stop being: tool callers
+and start becoming: reasoning systems
+
+
+
+
+
+
+
+
+
+
+
+PROJECT 2.1 — Research Assistant Agent
+
+⸻
+
+WHAT YOU ARE BUILDING
+A multi-step research reasoning agent that:
+Reads research abstract
+        ↓
+Extracts key claims
+        ↓
+Identifies limitations
+        ↓
+Generates beginner explanation
+        ↓
+Produces final structured report
+
+----- Stateful Multi-Step Agent
+
+Previously-
+Question
+→ One decision
+→ One answer
+
+Now:
+Question
+→ Step 1 reasoning
+→ Step 2 reasoning
+→ Step 3 reasoning
+→ Final synthesis
+
+This is foundational Agentic AI architecture.
+MASSIVE CONCEPTUAL SHIFT
+
+The agent now:
+
+* thinks incrementally
+* stores intermediate outputs
+* uses prior reasoning in later steps
+
+This is the beginning of:
+agent memory flow
+
+Concept 1 — Decomposition
+Large tasks become: smaller reasoning tasks
+
+This is core to:
+
+* autonomous agents
+* planners
+* LangGraph
+* MCP workflows
+
+Concept 2 — Working Memory
+Intermediate outputs become: temporary state
+
+Concept 3 — Sequential Cognition
+The model reasons:step-by-step
+
+Concept 4 — Structured Pipelines
+AI systems are workflows not just prompts.
+
+
+
+Research Abstract
+        ↓
+[Step 1]
+Claim Extraction Agent
+        ↓
+claims list
+        ↓
+[Step 2]
+Risk & Limitation Analyzer
+        ↓
+limitations list
+        ↓
+[Step 3]
+Beginner Explanation Generator
+        ↓
+final structured report
+
+
+Because LangGraph is fundamentally: state flowing across nodes
+
+project_2_1_research_assistant/
+
+│
+├── main.py
+├── agent.py
+├── prompts.py
+├── logger.py
+├── state.py
+├── validators.py
+├── sample_data/
+│   └── transformer_abstract.txt
+└── README.md
+
+
+
+
+WHAT YOU JUST LEARNED
+
+⸻
+
+1. Agents Are Stateful
+
+Critical.
+
+⸻
+
+2. Reasoning Can Be Sequential
+
+Critical.
+
+⸻
+
+3. Intermediate Outputs Matter
+
+Critical.
+
+⸻
+
+4. AI Systems Are Pipelines
+
+Critical.
+
+⸻
+
+5. Specialized Reasoning Beats Giant Prompts
+
+VERY important.

@@ -1,0 +1,127 @@
+Project 2.2 — Planning Agent
+
+The agent will:
+
+1. receive goal
+2. generate execution plan
+3. execute tasks sequentially
+4. track progress
+5. produce final output
+
+This introduces:
+
+* autonomous planning
+* dynamic workflows
+* execution state
+* task orchestration
+
+Up until now:
+YOU designed the workflow.
+
+Now:
+the AGENT designs the workflow.
+
+That is the beginning of:
+autonomous behavior
+
+PROJECT 2.2 — Planning Agent
+
+This is where your system starts becoming:
+genuinely agentic
+
+WHAT YOU ARE BUILDING
+A planning agent that:
+Receives a goal
+        ↓
+Creates execution plan
+        ↓
+Executes tasks sequentially
+        ↓
+Tracks completed work
+        ↓
+Generates final result
+
+
+THIS IS A HUGE MOMENT
+Because now the system is learning:
+“How should I solve this?”
+
+instead of:
+“Run this fixed pipeline.”
+
+Concept 1 — Planning
+The LLM generates:future actions
+
+This is foundational for:
+
+* AutoGPT
+* Devin-style agents
+* AI copilots
+* LangGraph planners
+* MCP orchestration
+
+
+Concept 2 — Execution State
+
+The agent now tracks:
+* pending tasks
+* completed tasks
+* execution history
+
+Concept 3 — Dynamic Workflows
+The workflow is no longer hardcoded.
+
+It becomes: LLM-generated
+
+Concept 4 — Task Decomposition
+The agent learns:large goal → smaller executable steps
+
+
+THE CORE MENTAL MODEL
+
+You are building:
+Planner
+    +
+Executor
+    +
+Memory
+
+This is foundational architecture for:
+
+* LangGraph
+* CrewAI
+* AutoGen
+* MCP systems
+
+EXAMPLE
+User Goal: "Help me learn QLoRA."
+
+Agent Plam:
+1. Explain what QLoRA is
+
+2. Explain quantization
+
+3. Explain LoRA
+
+4. Explain memory optimization
+
+5. Give beginner analogy
+
+Then the agent executes step-by-step.
+
+The LLM is no longer:
+just generating text
+it is now
+generating actions
+
+PROJECT STRUCTURE
+project_2_2_planning_agent/
+│
+├── main.py
+├── planner_agent.py
+├── prompts.py
+├── state.py
+├── logger.py
+├── task_executor.py
+├── validators.py
+└── README.md

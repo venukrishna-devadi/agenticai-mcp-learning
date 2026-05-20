@@ -1,0 +1,1 @@
+Transformers are deep learning architectures that rely entirely on self-attention mechanisms instead of recurrence. They enable parallel computation and improve long-range dependency handling in NLP tasks. However, transformers require significant computational resources and memory usage for large sequence lengths.

@@ -1,0 +1,143 @@
+Project 1.3 is a HUGE milestone.
+
+This is where your agent evolves from:
+tool-using assistant
+
+into
+
+knowledge-grounded agent
+
+This is the beginning of:
+
+* retrieval systems
+* RAG intuition
+* document QA
+* enterprise knowledge agents
+* MCP-connected data systems
+
+PROJECT 1.3
+
+File Reader Agent
+
+⸻
+
+THE CORE LESSON
+
+Until now:
+LLM relied mostly on internal knowledge
+
+Now
+LLM will use external knowledge from files
+
+This is foundational for:
+
+* RAG
+* enterprise AI
+* MCP tools
+* document assistants
+* copilots
+
+THE HUGE CONCEPTUAL SHIFT
+
+Previously:
+LLM = source of knowledge
+
+Now:
+LLM = reasoning engine
+Files = knowledge source
+
+This distinction is MASSIVE.
+
+Most real-world AI systems work this way.
+
+WHAT YOU WILL LEARN
+
+⸻
+
+Concept 1 — Grounding
+
+The agent stops hallucinating as much because:
+* answers come from files
+* not pure model memory
+
+This is called:
+grounding the model in external context.
+
+Concept 2 — Retrieval
+The agent learns
+"I should retrieve information before answering."
+This is proto-RAG behavior.
+⸻
+
+Concept 3 — Context Injection
+
+The file contents become:
+temporary working memory
+The model reasons over:
+
+* retrieved text
+* user question
+* instructions
+
+Concept 4 — Tool-Chained Reasoning
+The flow now becomes:
+Question
+ ↓
+Read File
+ ↓
+Extract Context
+ ↓
+Inject Context
+ ↓
+Reason Over Context
+ ↓
+Generate Answer
+
+
+ARCHITECTURE FLOW
+User Query
+     ↓
+Routing Agent
+     ↓
+Need File Access?
+ ┌──────────────┐
+ ↓ YES          ↓ NO
+Read File     Normal Response
+ ↓
+Inject File Context
+ ↓
+Answer Question
+ ↓
+Final Response
+
+IMPORTANT REALIZATION
+
+This project introduces:
+external memory.
+
+The LLM itself:
+
+* does NOT store the knowledge
+* only reasons over retrieved context
+
+That is exactly how:
+
+* RAG
+* copilots
+* enterprise agents
+* MCP data systems
+work conceptually.
+
+PROJECT STRUCTURE
+project_1_3_file_reader_agent/
+│
+├── main.py
+├── agent.py
+├── tools.py
+├── file_reader.py
+├── prompts.py
+├── validators.py
+├── logger.py
+├── sample_data/
+│   └── bofa_statement.txt
+└── README.md

@@ -1,0 +1,267 @@
+REAL agents:
+
+* make decisions
+* choose routes
+* select tools
+* branch dynamically
+
+This is where LangGraph becomes powerful.
+
+graph will now:
+decide where to go next
+based on: state + reasoning -> conditional routing
+
+                ┌────────────────┐
+                │  User Query    │
+                └──────┬─────────┘
+                       ↓
+              ┌─────────────────┐
+              │ ROUTER NODE     │
+              │ Decide Intent   │
+              └──────┬──────────┘
+                     │
+        ┌────────────┴────────────┐
+        ↓                         ↓
+┌────────────────┐      ┌────────────────┐
+│ SCIENCE NODE   │      │ MATH NODE      │
+└────────┬───────┘      └────────┬───────┘
+         ↓                        ↓
+         └────────────┬───────────┘
+                      ↓
+              ┌────────────────┐
+              │ FINAL NODE     │
+              └────────────────┘
+
+The graph decides execution path
+This is real orchestration architecture.
+
+
+What You Will Learn
+You’ll now understand:
+
+* conditional edges
+* routing functions
+* state-based decisions
+* graph branching
+* pydantic state models
+* structured state validation
+
+
+TypedDict works.
+
+But Pydantic gives:
+* validation
+* defaults
+* cleaner architecture
+* safer state management
+* production-grade design
+
+
+phase3/
+└── project_3.2/
+    ├── main.py
+    ├── graph_agent.py
+    ├── state.py
+    ├── nodes.py
+    ├── router.py
+    ├── prompts.py
+    ├── logger.py
+    └── local_llm.py
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           USER INPUT                                         │
+│                    "What is photosynthesis?"                                 │
+│                    "Solve: 25 * 4"                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          ROUTER NODE                                         │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  LLM decides: "math" or "science"                                   │   │
+│  │  Output stored in: state.route                                      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+                          ┌───────────────────────┐
+                          │   route_decision()     │
+                          │   (conditional edge)   │
+                          └───────────────────────┘
+                                      │
+                    ┌─────────────────┴─────────────────┐
+                    │                                   │
+                    ▼                                   ▼
+        ┌─────────────────────┐             ┌─────────────────────┐
+        │     MATH NODE        │             │    SCIENCE NODE      │
+        │  temperature = 0     │             │  temperature = 0.5   │
+        │  step-by-step solve  │             │  detailed explain    │
+        └─────────────────────┘             └─────────────────────┘
+                    │                                   │
+                    └─────────────────┬─────────────────┘
+                                      │
+                                      ▼
+                          ┌─────────────────────┐
+                          │    FINAL NODE        │
+                          │  polish the answer   │
+                          └─────────────────────┘
+                                      │
+                                      ▼
+                                    END
+
+
+
+
+
+
+
+🔧 LangGraph Component Breakdown
+
+1. StateGraph(AgentState)
+
+python
+workflow = StateGraph(AgentState)
+What it does: Creates an empty container for your graph.
+
+Analogy: Like a blank whiteboard where you'll draw your flowchart.
+
+Your AgentState has:
+
+python
+class AgentState(BaseModel):
+    user_query: str    # "What is photosynthesis?"
+    route: str         # "science" (decided by router)
+    reasoning: str     # Detailed explanation from math/science node
+    final_answer: str  # Polished final response
+2. add_node(name, function)
+
+python
+workflow.add_node("router", lambda state: router_node(state, self.llm))
+What it does: Registers a function as a "node" (a step) in your graph.
+
+Key insight: The node function must:
+
+Receive state as input
+Modify it (add new fields)
+Return the updated state
+Your nodes:
+
+Node Name	Function	What it does
+router	router_node()	Decides math vs science
+math_node	math_node()	Solves math problems
+science_node	science_node()	Explains science concepts
+final_node	final_node()	Polishes the answer
+3. set_entry_point(node_name)
+
+python
+workflow.set_entry_point("router")
+What it does: Tells LangGraph which node to execute FIRST.
+
+Why it matters: Your graph could start anywhere. This defines the beginning.
+
+4. add_conditional_edges(source, router_function, path_map)
+
+python
+workflow.add_conditional_edges(
+    "router",           # Source node
+    route_decision,     # Function that returns a string
+    {
+        "math_node": "math_node",     # If returns "math_node"
+        "science_node": "science_node" # If returns "science_node"
+    }
+)
+What it does: Creates a branching path - the graph can go to different nodes based on state.
+
+Your router function:
+
+python
+def route_decision(state):
+    if state.route == "math":
+        return "math_node"    # LangGraph goes to math_node
+    return "science_node"     # LangGraph goes to science_node
+This is the MAGIC of LangGraph! The graph DECIDES which path to take.
+
+5. add_edge(from_node, to_node)
+
+python
+workflow.add_edge("math_node", "final_node")
+What it does: Creates a fixed path - ALWAYS go from A to B.
+
+Unlike conditional edges, this is deterministic:
+
+math_node ALWAYS goes to final_node
+science_node ALWAYS goes to final_node
+6. END
+
+python
+workflow.add_edge("final_node", END)
+What it does: A special constant that marks the end of the graph.
+
+When LangGraph reaches END, execution stops and returns the final state.
+
+7. compile()
+
+python
+self.graph = workflow.compile()
+What it does:
+
+Validates your graph (checks all nodes exist, no cycles, etc.)
+Converts your declarative definition into an executable object
+Returns a CompiledGraph you can run
+Think of it like: Compiling code - checks for errors before running.
+
+8. invoke(initial_state)
+
+python
+result = self.graph.invoke(initial_state)
+What it does:
+
+Starts execution from the entry point
+Passes the initial state through each node
+Follows edges (conditional or fixed)
+Returns the final state when reaching END
+What returns: The FINAL AgentState object with all fields populated.
+
+🎬 Step-by-Step Execution Trace
+
+Let's trace a science question:
+
+python
+# User input
+user_query = "What is photosynthesis?"
+
+# Step 1: Initial state created
+initial_state = AgentState(user_query="What is photosynthesis?")
+# State: {user_query: "What is photosynthesis?", route: "", reasoning: "", final_answer: ""}
+
+# Step 2: Enter graph at "router"
+# router_node() executes
+response = llm.chat("math or science?", "What is photosynthesis?")
+# LLM returns: "science"
+
+# router_node updates state:
+state.route = "science"
+# State: {user_query: "What is photosynthesis?", route: "science", ...}
+
+# Step 3: Conditional edge checks
+route_decision(state) returns "science_node"
+# LangGraph goes to "science_node"
+
+# Step 4: science_node executes
+response = llm.chat("Explain scientifically", "What is photosynthesis?")
+state.reasoning = response
+# State: {..., reasoning: "Photosynthesis is the process plants use..."}
+
+# Step 5: Fixed edge
+workflow.add_edge("science_node", "final_node")
+# LangGraph goes to "final_node"
+
+# Step 6: final_node executes
+response = llm.chat("Polish this", state.reasoning)
+state.final_answer = response
+# State: {..., final_answer: "In simple terms, photosynthesis is how plants make food..."}
+
+# Step 7: Fixed edge to END
+workflow.add_edge("final_node", END)
+# Execution stops, return final state

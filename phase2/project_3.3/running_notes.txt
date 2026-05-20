@@ -1,0 +1,308 @@
+Project 3.3 — Tool Calling Agent
+
+The Beginning of REAL Agentic AI
+
+Now you are entering the most important transition so far.
+
+Up until now:
+* your agents could think
+* route
+* critique
+* improve answers
+
+no ability to interact with the outside world
+
+Your agent will now:
+
+decide when to use tools
+
+This is:
+
+* calculator use
+* search use
+* database access
+* API calling
+* filesystem usage
+* MCP tool execution
+
+Now - LLM generates ACTIONS
+This is the core idea behind:
+
+* OpenAI Tool Calling
+* MCP
+* ReAct
+* LangGraph agents
+* AutoGen
+* CrewAI
+* Devin-style systems
+
+             ┌─────────────────┐
+             │ USER QUESTION   │
+             └────────┬────────┘
+                      ↓
+             ┌─────────────────┐
+             │ THINK NODE      │
+             │ Need Tool?      │
+             └───────┬─────────┘
+                     │
+         ┌───────────┴───────────┐
+         ↓                       ↓
+┌─────────────────┐     ┌─────────────────┐
+│ TOOL NODE       │     │ FINAL NODE      │
+│ Execute Tool    │     │ Direct Answer   │
+└────────┬────────┘     └─────────────────┘
+         ↓
+┌─────────────────┐
+│ FINAL NODE      │
+└─────────────────┘
+
+The LLM will not directly solve math
+Instead:
+{
+  "need_tool": true,
+  "tool": "calculator",
+  "tool_input": "45 * 92"
+}
+
+What You Will Learn
+
+You will now understand:
+
+* tool calling architecture
+* action generation
+* reasoning + acting loop
+* structured outputs
+* Pydantic tool schemas
+* conditional execution
+* external capability augmentation
+
+phase3/
+└── project_3.3/
+    ├── main.py
+    ├── graph_agent.py
+    ├── state.py
+    ├── nodes.py
+    ├── router.py
+    ├── prompts.py
+    ├── tools.py
+    ├── schemas.py
+    ├── logger.py
+    └── local_llm.py
+
+We now separate:
+
+1. Reasoning
+from
+
+2. Action Execution
+This separation is the heart of modern agents.
+
+
+
+
+
+
+
+
+Side-by-Side Comparison
+
+Aspect	Project 3.2 (Router)	Project 3.3 (Tool-Using Agent)
+What is routed?	Domain (math/science/history)	Need for tool (calculator or not)
+Node purpose	Process the answer	Execute external action
+State tracking	Just the answer	Tool inputs, outputs, execution trace
+Agent's capability	Answer questions	DO things (calculate, act)
+Output source	LLM generates answer	Tool computes + LLM synthesizes
+🧠 The HUGE Conceptual Difference
+
+Project 3.2 - Domain Router (Classifier)
+
+text
+User: "What is 2+2?"
+    ↓
+Router: "math"
+    ↓
+Math Node: LLM answers "4"
+    ↓
+Done.
+The LLM still does ALL the work. It just has specialized prompts.
+
+Project 3.3 - Tool-Using Agent (Executor)
+
+text
+User: "What is 2+2?"
+    ↓
+Think Node: "Need calculator with input '2+2'"
+    ↓
+Tool Node: calculator(2+2) → "4"  ← PYTHON computes!
+    ↓
+Final Node: LLM synthesizes "The answer is 4"
+The LLM DELEGATES work to a tool. This is fundamentally different!
+
+🔬 The 5 Key Differences
+
+1. Cognition vs Action
+
+Project 3.2	Project 3.3
+LLM thinks and answers	LLM thinks → Tool acts → LLM explains
+Single cognitive step	Separation of reasoning from execution
+Why this matters: This is the foundation of ALL agentic systems. The LLM shouldn't do math - it should know WHEN to use a calculator.
+
+2. Structured Tool Calling
+
+Project 3.2:
+
+python
+# Just routing domain
+state.route = "math"  # Simple string
+Project 3.3:
+
+python
+# Structured tool call with parameters!
+decision = ToolDecision(
+    need_tool=True,
+    tool_name="calculator",
+    tool_input="2+2"  # ← LLM extracts this!
+)
+Why this matters: This is EXACTLY how OpenAI function calling, MCP, and every tool-using API works.
+
+3. External Execution
+
+Project 3.2:
+
+python
+def math_node(state, llm):
+    # LLM generates the answer
+    response = llm.chat(...)  # ← LLM does math (unreliable!)
+Project 3.3:
+
+python
+def tool_node(state):
+    if state.selected_tool == "calculator":
+        result = calculator(state.tool_input)  # ← PYTHON does math (perfect!)
+Why this matters: LLMs are BAD at math. Tools are PERFECT at math. Delegation = accuracy.
+
+4. State Evolution
+
+Project 3.2 State:
+
+python
+class AgentState:
+    user_query: str
+    route: str           # Where to go
+    reasoning: str       # LLM's answer
+    final_response: str  # Polished answer
+Project 3.3 State:
+
+python
+class AgentState:
+    user_query: str
+    need_tool: bool      # Decision
+    selected_tool: str   # Which tool
+    tool_input: str      # What to pass
+    tool_output: str     # Tool's result  ← NEW!
+    final_answer: str    # Final response
+Why this matters: You now track execution trace - what the agent DID, not just what it SAID.
+
+5. The Flow Pattern
+
+Project 3.2 (Classification Pattern):
+
+text
+Input → Classify → Specialized LLM → Output
+Project 3.3 (ReAct Pattern - Reason + Act):
+
+text
+Input → Reason → Act → Observe → Synthesize → Output
+         ↑         ↓
+         └─────────┘ (can loop)
+Why this matters: This is the ReAct pattern (Reasoning + Acting) - the foundation of agents like AutoGPT, BabyAGI, and LangChain agents.
+
+🎯 The Learning Progression
+
+text
+Project 3.2: "I can classify questions"
+     ↓
+Project 3.3: "I can USE TOOLS to solve problems"
+     ↓
+Project 3.4: "I can chain multiple tools"
+     ↓
+Project 3.5: "I can plan which tools to use in sequence"
+💡 The "Aha Moment" Example
+
+Ask both agents: "What is 12345 * 67890?"
+
+Project 3.2 (Domain Router):
+
+text
+Router: "math"
+Math Node (LLM): "Approximately 838,000,000"  ← WRONG! LLM hallucinates
+Project 3.3 (Tool User):
+
+text
+Think Node: "Need calculator with '12345 * 67890'"
+Tool Node (Python): 12345 * 67890 = 838,102,050  ← EXACT!
+Final Node: "The answer is 838,102,050"  ← CORRECT!
+This is the POWER of tool-using agents!
+
+📋 Conceptual Summary
+
+Concept	Project 3.2	Project 3.3
+Primary pattern	Classification	ReAct (Reason + Act)
+LLM role	Answer generator	Decision maker + Synthesizer
+Computation source	LLM's memory	External tools
+Accuracy for math	Poor (hallucinates)	Perfect (Python computes)
+Extensibility	Add more domains	Add more tools
+Production use	Customer support routing	API calling, data processing
+🚀 Why This Matters for Your Learning Path
+
+You've just built the exact architecture used by:
+
+Production System	What It Does
+ChatGPT Plugins	LLM decides → Tool executes
+Claude's Tool Use	Structured tool calling
+AutoGPT	ReAct pattern
+MCP Servers	Tool discovery + execution
+Project 3.2 taught you routing.
+Project 3.3 taught you delegation.
+
+Routing = "Where should I send this?"
+Delegation = "Should I do this or use a tool?"
+
+You need BOTH for production agents.
+
+🔧 Try This Experiment
+
+Run the same query on both agents:
+
+python
+query = "Calculate 999 * 888"
+Project 3.2 Output: LLM might say "887,112" (could be wrong)
+Project 3.3 Output: Python calculates "887,112" (ALWAYS right)
+
+This is the difference between a "chatbot" and an "agent"!
+
+📝 One Small Bug in Your Code
+
+In graph_agent.py, line 31:
+
+python
+# WRONG (using comma instead of colon):
+{
+    "tool_node", "tool_node",  # ← This creates a SET, not a DICT!
+    "final_node", "final_node"
+}
+
+# RIGHT (use colons):
+{
+    "tool_node": "tool_node",
+    "final_node": "final_node"
+}
+Fix this or your conditional edges won't work!
+
+🎉 Summary
+
+Project 3.2	Project 3.3
+What you learned	Domain classification	Tool delegation
+LLM capability	Routes to experts	Decides to use tools
+Next step	Add more domains	Add more tools (search, DB, API)
+You've built TWO different types of agents - both essential for real-world AI systems! 🚀

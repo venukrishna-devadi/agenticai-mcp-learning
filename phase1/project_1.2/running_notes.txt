@@ -1,0 +1,374 @@
+Project 1.2 — Calculator Tool Agent
+
+This is one of the biggest conceptual jumps in early Agentic AI.
+
+⸻
+
+THE CORE LESSON
+
+This project teaches:
+LLMs should reason.
+Tools should compute.
+This distinction is foundational.
+
+⸻
+
+HUGE CONCEPTUAL SHIFT
+
+Right now your LLM:
+
+* routes
+* selects tools
+
+Now it will also learn:
+"I should NOT do math myself."
+Instead:
+Reason → Delegate → Observe → Respond
+This is the core philosophy behind:
+
+* MCP
+* tool calling
+* OpenAI function calling
+* LangGraph tools
+* AutoGen
+* CrewAI
+
+everything.
+
+⸻
+
+WHY THIS PROJECT MATTERS SO MUCH
+
+Without tools:
+LLM = unreliable calculator
+With tools:
+LLM = orchestrator
+Calculator = deterministic engine
+This separation changes everything.
+
+⸻
+
+ARCHITECTURE FLOW
+User Question
+      ↓
+Intent Router
+      ↓
+Math?
+ ┌─────────────┐
+ ↓ YES         ↓ NO
+Calculator   Normal LLM
+ ↓              ↓
+Tool Result   Response
+      ↓
+Final Output
+WHAT YOU WILL LEARN
+
+⸻
+
+Concept 1 — Deterministic Tool Execution
+
+Math should be:
+
+* exact
+* reproducible
+* non-hallucinatory
+
+LLMs are bad at this.
+
+⸻
+
+Concept 2 — Tool Delegation
+
+The LLM learns:
+"I should use external capability."
+This is the beginning of:
+
+* APIs
+* DB queries
+* search tools
+* MCP servers
+
+⸻
+
+Concept 3 — Structured Tool Input
+
+The agent must generate:
+{
+  "tool": "calculator",
+  "expression": "25 * 12"
+}
+This is proto-function-calling.
+
+VERY important.
+
+⸻
+
+NEW CONCEPT:
+
+ACTION + PARAMETERS
+
+{
+  "tool": "calculator",
+  "expression": "45 / 5"
+}
+Now the agent must:
+
+* choose tool
+* extract arguments
+
+This is a major evolution.
+
+⸻
+
+PROJECT STRUCTURE
+project_1_2_calculator_agent/
+│
+├── main.py
+├── agent.py
+├── tools.py
+├── prompts.py
+├── validators.py
+├── calculator.py
+├── logger.py
+└── README.md
+NEW LEARNING:
+
+SAFE TOOL EXECUTION
+
+You should NEVER do:
+eval(user_input)
+directly.
+
+This is dangerous.
+
+So we build:
+
+* controlled execution
+* restricted parsing
+* safe operators
+
+This introduces:
+
+tool safety.
+
+Very important in MCP systems.
+
+⸻
+
+WHAT WE WILL BUILD
+
+The agent will:
+
+1. inspect user request
+2. determine if math exists
+3. extract expression
+4. call calculator tool
+5. return exact result
+
+⸻
+
+EXAMPLE
+
+User:
+What is 25 * 19?
+Agent Decision:
+{
+  "tool": "calculator",
+  "expression": "25 * 19"
+}
+Tool Executes:
+25 * 19 = 475
+IMPORTANT AHA MOMENT
+
+The LLM itself did NOT compute.
+
+It only:
+
+* recognized intent
+* extracted parameters
+* delegated execution
+
+That distinction is the heart of modern agents.
+
+⸻
+
+WHAT YOU WILL EXPERIENCE
+
+You’ll notice:
+
+* extraction errors
+* malformed expressions
+* hallucinated operators
+* wrong parameter formatting
+
+GOOD.
+
+That is how you learn tool reliability.
+
+⸻
+
+WHAT THIS PREPARES YOU FOR
+
+This project is the bridge toward:
+
+* APIs
+* databases
+* file systems
+* search tools
+* MCP tool registries
+
+Because all future tools follow the same pattern:
+Reason
+ ↓
+Select Tool
+ ↓
+Extract Parameters
+ ↓
+Execute Tool
+ ↓
+Observe Result
+That is the universal agent loop.
+
+
+Tool-Using Agent
+
+This is a major milestone.
+
+Until now:
+
+* your agent selected actions
+
+Now:
+
+* your agent will execute deterministic tools
+
+This is where agentic systems start becoming genuinely powerful.
+
+CORE LEARNING OBJECTIVE
+
+Teach the LLM:
+"I should not calculate manually.
+I should delegate computation to tools."
+
+This principle becomes:
+* API usage
+* database querying
+* web search
+* MCP tool execution
+* enterprise system integration
+
+later.
+
+KEY CONCEPTS INTRODUCED
+
+1. Tool Delegation
+LLM will be reasoning engine.
+Calculator is a deterministic execution engine
+
+2. Structured Tool Arguments
+The model must generate:
+{
+  "tool": "calculator",
+  "expression": "25 * 7"
+}
+Now we have:
+* tool name
+* tool parameters
+This is foundational MCP behavior.
+
+3. Safe Execution
+You NEVER trust:
+eval(raw_user_input)
+
+We must:
+* validate
+* sanitize
+* restrict operators
+
+This is critical in real systems.
+
+ARCHITECTURE FLOW
+User Query
+     ↓
+Routing Agent
+     ↓
+JSON Tool Decision
+     ↓
+Validator
+     ↓
+Calculator Tool
+     ↓
+Execution Result
+     ↓
+Final Response
+
+project_1_2_calculator_agent/
+│
+├── main.py
+├── agent.py
+├── calculator.py
+├── tools.py
+├── prompts.py
+├── validators.py
+├── logger.py
+└── README.md
+
+
+
+
+
+
+
+WHAT YOU JUST LEARNED
+
+⸻
+
+1. LLMs Should Delegate Deterministic Tasks
+
+Critical principle.
+
+⸻
+
+2. Tool Parameters Matter
+
+Tool use requires:
+
+* structured arguments
+* validation
+* extraction
+
+⸻
+
+3. Safety Layers Are Essential
+
+Especially for execution tools.
+
+⸻
+
+4. Agents Are Orchestrators
+
+The LLM:
+
+* reasons
+* routes
+* coordinates
+
+Tools:
+
+* execute
+
+
+WHAT THIS PREPARES YOU FOR
+
+Next:
+
+Project 1.3 — File Reader Agent
+
+This is another major milestone because:
+
+* tools will access external knowledge
+* retrieval begins
+* grounding begins
+* proto-RAG begins
+
+Your agent will stop relying purely on:

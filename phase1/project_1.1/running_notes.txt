@@ -1,0 +1,182 @@
+Project 1.1 — Intent Decision Agent
+
+Now the LLM will:
+
+* reason
+* choose a tool
+* execute action
+* return result
+
+This is your first real “agent”.
+
+And because you completed Project 0.2 properly:
+you now understand WHY validation matters in agent workflows.
+PHASE 1 — SINGLE-STEP AGENTS
+
+Project 1.1 — Intent Decision Agent
+
+This is your first real agent.
+
+Up until now:
+
+* you experimented with LLM behavior
+* validated outputs
+* built reliability layers
+
+Now the model will:
+
+make decisions.
+
+That is the beginning of agentic behavior.
+
+⸻
+
+CORE IDEA OF THIS PROJECT
+
+The agent must decide:
+Should I:
+- summarize?
+OR
+- generate detailed breakdown?
+This may look simple.
+
+But conceptually, this is massive.
+
+Because now the LLM is no longer:
+
+just generating text
+
+It is:
+
+selecting actions.
+
+That is the foundation of:
+
+* tool use
+* MCP
+* LangGraph routing
+* multi-agent systems
+
+⸻
+
+WHAT YOU ARE LEARNING HERE
+
+This project introduces:
+
+Concept 1 — Intent Routing
+
+The model determines:
+
+what action should happen.
+
+⸻
+
+Concept 2 — Tool Invocation
+
+The model does not directly answer.
+
+Instead:
+
+* selects a tool
+* tool performs work
+* agent returns result
+
+This separation is critical.
+
+⸻
+
+IMPORTANT MENTAL MODEL
+
+Traditional apps:
+User → Function → Result
+Agentic systems:
+User
+ ↓
+LLM Reasoning
+ ↓
+Decision
+ ↓
+Tool
+ ↓
+Result
+ ↓
+Final Response
+That extra reasoning layer changes everything.
+
+⸻
+
+PROJECT ARCHITECTURE
+User Request
+      ↓
+Intent Agent
+      ↓
+Tool Decision
+ ┌──────────────┐
+ ↓              ↓
+Summarize    Breakdown
+ ↓              ↓
+Tool Output
+      ↓
+Final Response
+WHAT WE WILL BUILD
+
+A small agent with:
+
+* routing logic
+* tool abstraction
+* validation
+* verbose reasoning logs
+
+We’ll also improve the earlier version slightly using:
+
+* structured outputs
+* retry-safe routing
+* better architecture
+
+⸻
+
+PROJECT STRUCTURE
+project_1_1_intent_agent/
+│
+├── main.py
+├── agent.py
+├── tools.py
+├── prompts.py
+├── validators.py
+├── logger.py
+└── README.md
+
+WHY JSON HERE?
+
+Very important learning.
+{
+  "tool": "summarize"
+}
+This introduces:
+structured agent decisions.
+This is proto-MCP behavior.
+
+STEP 3 — validators.py
+
+We validate:
+
+* JSON structure
+* valid tool names
+
+STEP 4 — tools.py
+These are your agent capabilities.
+
+IMPORTANT:
+The tools do the work.
+The agent only decides.
+
+STEP 5 — agent.py
+This is the brain.
+This is where:
+
+* reasoning
+* validation
+* retries
+* execution
+
+all connect together.

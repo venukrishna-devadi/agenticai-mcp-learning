@@ -1,0 +1,71 @@
+PROJECT 3.5 — PHASE 1
+Human-in-the-Loop (HITL) ReAct Agent
+
+GOAL OF PHASE 1
+We want the agent to:
+1. Think
+2. Decide if uncertain
+3. Ask human clarification
+4. Receive human input
+5. Continue reasoning
+6. Produce final answer
+
+WHAT WE ARE NOT ADDING YET
+NOT YET:
+
+* audit trails
+* approvals
+* policy engines
+* overrides
+* compliance
+
+ONLY HITL interruption + resume.
+
+CORE CONCEPT OF THIS PROJECT
+This project introduces: INTERRUPTIBLE AGENTS
+
+Meaning:
+the graph can pause and ask for help.
+
+                ┌─────────────┐
+                │ THINK NODE  │
+                └──────┬──────┘
+                       │
+            ┌──────────┴──────────┐
+            │                     │
+            ▼                     ▼
+     HUMAN NEEDED?           TOOL NEEDED?
+            │                     │
+      YES ──┘                     └── YES
+            ▼                           ▼
+     HUMAN NODE                  TOOL NODE
+            │                           │
+            └──────────┬────────────────┘
+                       ▼
+                 THINK AGAIN
+                       │
+                       ▼
+                  FINAL NODE
+
+Previously: tool_output was the only external observation.
+Now: human_response also becomes an observation. humans are now part of the reasoning loop.
+
+project_3.5/
+│
+├── main.py
+├── graph.py
+├── state.py
+│
+├── nodes/
+│   ├── think_node.py
+│   ├── tool_node.py
+│   ├── human_node.py
+│   └── final_node.py
+│
+├── prompts/
+│   └── think_prompt.py
+│
+├── tools/
+│   └── calculator_tool.py
+│
+└── local_llm.py

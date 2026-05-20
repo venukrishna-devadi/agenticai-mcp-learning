@@ -1,0 +1,12 @@
+Phase 1 — Single-Step Agents
+
+Because now you understand:
+
+* prompting
+* routing stability
+* structured outputs
+* validation loops
+* retries
+
+Without this foundation:
+agents become frustrating very quickly.
