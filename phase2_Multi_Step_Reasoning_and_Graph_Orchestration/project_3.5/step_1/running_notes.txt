@@ -27,25 +27,59 @@ This project introduces: INTERRUPTIBLE AGENTS
 Meaning:
 the graph can pause and ask for help.
 
-                ┌─────────────┐
-                │ THINK NODE  │
-                └──────┬──────┘
-                       │
-            ┌──────────┴──────────┐
-            │                     │
-            ▼                     ▼
-     HUMAN NEEDED?           TOOL NEEDED?
-            │                     │
-      YES ──┘                     └── YES
-            ▼                           ▼
-     HUMAN NODE                  TOOL NODE
-            │                           │
-            └──────────┬────────────────┘
-                       ▼
-                 THINK AGAIN
-                       │
-                       ▼
-                  FINAL NODE
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    PROJECT 3.5 - HITL ReAct Agent                           │
+│                       (Interruptible Execution)                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                                    START
+                                      │
+                                      ▼
+                        ┌─────────────────────────┐
+                        │       MAIN.PY           │
+                        │  User: "What is 2+2?"   │
+                        └────────────┬────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           🧠 THINK NODE                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  • Analyzes user query + human_response (if any)                           │
+│  • Decides: need_tool? need_human? or final?                               │
+│  • Outputs JSON with confidence score                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+                        ┌─────────────────────────┐
+                        │     ROUTER FUNCTION      │
+                        │  if need_human → human   │
+                        │  if need_tool → tool     │
+                        │  else → final            │
+                        └────────────┬────────────┘
+                                      │
+            ┌─────────────────────────┼─────────────────────────┐
+            │                         │                         │
+            ▼                         ▼                         ▼
+    ┌───────────────┐         ┌───────────────┐         ┌───────────────┐
+    │  HUMAN NODE   │         │  TOOL NODE    │         │  FINAL NODE   │
+    │               │         │               │         │               │
+    │ • Ask question│         │ • Execute tool│         │ • Synthesize  │
+    │ • Wait for    │         │ • Store output│         │   answer      │
+    │   input       │         └───────┬───────┘         └───────┬───────┘
+    │ • Store       │                 │                         │
+    │   response    │                 │                         │
+    └───────┬───────┘                 │                         │
+            │                         │                         │
+            └────────────┬────────────┘                         │
+                         │                                      │
+                         ▼                                      │
+            ┌───────────────────────┐                          │
+            │    THINK NODE (again) │◄─────────────────────────┘
+            │  (with new context)   │
+            └───────────────────────┘
+                         │
+                         ▼
+                      (LOOP until final)
 
 Previously: tool_output was the only external observation.
 Now: human_response also becomes an observation. humans are now part of the reasoning loop.

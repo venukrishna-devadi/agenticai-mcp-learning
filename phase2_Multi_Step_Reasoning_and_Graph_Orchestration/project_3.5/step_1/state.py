@@ -5,7 +5,7 @@ class AgentState(BaseModel):
 
     user_query: str
 
-    current_thought: str = Any
+    current_thought: str = ""
 
     need_tool: bool = False
     selected_tool: str = ""

@@ -1,0 +1,469 @@
+📊 MASTER FLOW CHART - Project 3.5 Step 2 (Full Build)
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                    PROJECT 3.5 STEP 2 - CORRECTED ARCHITECTURE                      │
+│              (Retry Strategy + Confidence Matrix + Observation Layer)               │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+                                    ┌─────────────┐
+                                    │    START    │
+                                    └──────┬──────┘
+                                           │
+                                           ▼
+                              ┌─────────────────────────┐
+                              │       MAIN.PY           │
+                              │  user_query = input()   │
+                              └────────────┬────────────┘
+                                           │
+                                           ▼
+                              ┌─────────────────────────┐
+                              │   INITIALIZE STATE      │
+                              │  • session_id = uuid()  │
+                              │  • step_count = 0       │
+                              │  • retry_count = 0      │
+                              │  • confidence = 0.0     │
+                              └────────────┬────────────┘
+                                           │
+                                           ▼
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                              🧠 THINK NODE                                          │
+├─────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                      │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │  STEP A: CHECK LOOP GUARD                                                    │   │
+│  │  if step_count >= max_steps → FORCE FINAL                                    │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                              │
+│                                      ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │  STEP B: CHECK OBSERVATION LAYER (NEW!)                                      │   │
+│  │  • Review last observation (tool output or human response)                  │   │
+│  │  • Determine if observation resolves the query                              │   │
+│  │  • If yes → need_tool=False, need_human=False                               │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                              │
+│                                      ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │  STEP C: CHECK REPEATED FAILURES (NOT just duplicates)                      │   │
+│  │  if retry_count >= 3 AND last_action == "tool_failed":                      │   │
+│  │      # Change strategy, don't just ask human                                │   │
+│  │      strategy = "MODIFY_INPUT" or "SWITCH_TOOL" or "ASK_HUMAN"              │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                              │
+│                                      ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │  STEP D: CONFIDENCE + CONTEXT MATRIX (Fixed!)                               │   │
+│  │                                                                              │   │
+│  │  ┌────────────────────────────────────────────────────────────────────┐    │   │
+│  │  │  Confidence  │ Tool Avail │ Ambiguity  │    ACTION                 │    │   │
+│  │  ├─────────────┼────────────┼────────────┼───────────────────────────┤    │   │
+│  │  │ < 0.3       │ ANY        │ ANY        │ ASK HUMAN (required)       │    │   │
+│  │  │ 0.3 - 0.6   │ YES        │ LOW        │ TRY TOOL (with caution)    │    │   │
+│  │  │ 0.3 - 0.6   │ NO         │ HIGH       │ ASK HUMAN                  │    │   │
+│  │  │ 0.6 - 0.8   │ YES        │ LOW        │ TOOL PREFERRED             │    │   │
+│  │  │ 0.6 - 0.8   │ NO         │ -          │ DIRECT ANSWER (with note)  │    │   │
+│  │  │ > 0.8       │ -          │ -          │ DIRECT ANSWER              │    │   │
+│  │  └────────────────────────────────────────────────────────────────────┘    │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                              │
+│                                      ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │  STEP E: LLM REASONING (with observation context)                          │   │
+│  │  prompt = f"""                                                              │   │
+│  │  User: {user_query}                                                        │   │
+│  │  Last Observation: {last_observation}                                      │   │
+│  │  Previous attempts: {retry_count}                                          │   │
+│  │  """                                                                       │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+                                           │
+                                           ▼
+                              ┌─────────────────────────┐
+                              │      ROUTER             │
+                              │  route_decision()       │
+                              └────────────┬────────────┘
+                                           │
+              ┌────────────────────────────┼────────────────────────────┐
+              │                            │                            │
+              ▼                            ▼                            ▼
+    ┌─────────────────┐          ┌─────────────────┐          ┌─────────────────┐
+    │  need_human?    │          │  need_tool?     │          │     FINAL       │
+    └────────┬────────┘          └────────┬────────┘          └────────┬────────┘
+             │                            │                            │
+             ▼                            ▼                            ▼
+┌─────────────────────────┐   ┌─────────────────────────┐   ┌─────────────────────────┐
+│    👤 HUMAN NODE        │   │    🔧 TOOL NODE         │   │    ✅ FINAL NODE        │
+├─────────────────────────┤   ├─────────────────────────┤   ├─────────────────────────┤
+│                         │   │                         │   │                         │
+│  • Ask clarification    │   │  • Execute tool         │   │  • Synthesize final     │
+│  • Wait for response    │   │  • Capture output       │   │    answer               │
+│  • Store in observation │   │  • Store in observation │   │                         │
+│                         │   │                         │   │                         │
+│  🔄 On failure:         │   │  🔄 On failure:         │   │                         │
+│  • retry_count++        │   │  • retry_count++        │   │                         │
+│  • Modify question      │   │  • Modify input strategy│   │                         │
+│  • OR switch to tool    │   │  • OR try different tool│   │                         │
+│                         │   │  • ONLY ask human after │   │                         │
+│                         │   │    3 retries            │   │                         │
+└────────────┬────────────┘   └────────────┬────────────┘   └────────────┬────────┘
+             │                              │                            │
+             │                              │                            │
+             ▼                              ▼                            ▼
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                         🔄 OBSERVATION LAYER (NEW!)                                  │
+│                                                                                      │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │  observation = {                                                            │   │
+│  │      "type": "tool_output" or "human_response",                             │   │
+│  │      "content": "...",                                                      │   │
+│  │      "success": True/False,                                                 │   │
+│  │      "retry_needed": False                                                  │   │
+│  │  }                                                                          │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                              │
+│                                      ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │  OBSERVATION ANALYZER:                                                      │   │
+│  │  • Does this answer the user's question?                                    │   │
+│  │  • Is more information needed?                                              │   │
+│  │  • Did the tool fail? → increment retry_count                               │   │
+│  │  • Did human provide incomplete info? → ask follow-up                       │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+                              ┌─────────────────┐
+                              │  BACK TO THINK  │
+                              │  (with updated  │
+                              │   observation)  │
+                              └─────────────────┘                     │
+┌─────────────────────────────────────────────────────────────────────────┐    │
+│                         🔄 LOOP BACK TO THINK NODE                       │    │
+│                    (with updated state + history)                       │    │
+└─────────────────────────────────────────────────────────────────────────┘    │
+                                                                                │
+                                                                                ▼
+                                                                          ┌─────────┐
+                                                                          │   END   │
+                                                                          └─────────┘
+
+
+
+📊 STATE MACHINE DIAGRAM
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                              STATE TRANSITIONS                                       │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+                                    ┌─────────────────┐
+                                    │   INITIAL       │
+                                    │   step_count=0  │
+                                    │   need_tool=F   │
+                                    │   need_human=F  │
+                                    └────────┬────────┘
+                                             │
+                                             ▼
+                                    ┌─────────────────┐
+                                    │   THINK NODE    │
+                                    │   (reasoning)   │
+                                    └────────┬────────┘
+                                             │
+                    ┌────────────────────────┼────────────────────────┐
+                    │                        │                        │
+                    ▼                        ▼                        ▼
+            ┌───────────────┐        ┌───────────────┐        ┌───────────────┐
+            │  need_human   │        │  need_tool    │        │   FINAL       │
+            │  = True       │        │  = True       │        │   (exit)      │
+            └───────┬───────┘        └───────┬───────┘        └───────────────┘
+                    │                        │
+                    ▼                        ▼
+            ┌───────────────┐        ┌───────────────┐
+            │  HUMAN NODE   │        │  TOOL NODE    │
+            │               │        │               │
+            │  • Ask        │        │  • Execute    │
+            │  • Wait       │        │  • Store      │
+            │  • Store      │        │  • Log        │
+            └───────┬───────┘        └───────┬───────┘
+                    │                        │
+                    │    (after response)    │    (after execution)
+                    └────────────┬───────────┘
+                                 │
+                                 ▼
+                    ┌─────────────────────────┐
+                    │   step_count++          │
+                    │   history.append()      │
+                    │   RETURN TO THINK       │
+                    └─────────────────────────┘
+
+    ⚠️ TERMINATION CONDITIONS:
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │ 1. step_count >= max_steps → FORCE FINAL                                        │
+    │ 2. need_tool=False AND need_human=False → FINAL                                │
+    │ 3. Duplicate tool call detected (3+ times) → FORCE HUMAN                      │
+    │ 4. Confidence < 0.3 AND step_count > 2 → FORCE FINAL with apology             │
+    └─────────────────────────────────────────────────────────────────────────────────┘
+
+
+📊 CONFIDENCE-BASED ROUTING
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                    CONFIDENCE + CONTEXT DECISION MATRIX                              │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+Confidence →  0.0-0.3        0.3-0.6        0.6-0.8        0.8-1.0
+─────────────────────────────────────────────────────────────────────────────────────
+
+Tool Available = YES + Ambiguity = LOW
+─────────────────────────────────────────────────────────────────────────────────────
+               ASK HUMAN      TRY TOOL       TOOL OK        DIRECT
+                             (with note)    (preferred)
+
+Tool Available = YES + Ambiguity = HIGH
+─────────────────────────────────────────────────────────────────────────────────────
+               ASK HUMAN      ASK HUMAN      TOOL +         DIRECT
+                                            VERIFY         (with source)
+
+Tool Available = NO + Ambiguity = LOW
+─────────────────────────────────────────────────────────────────────────────────────
+               ASK HUMAN      DIRECT         DIRECT         DIRECT
+                             (low conf)     (ok)
+
+Tool Available = NO + Ambiguity = HIGH
+─────────────────────────────────────────────────────────────────────────────────────
+               ASK HUMAN      ASK HUMAN      ASK HUMAN      DIRECT
+                                                                 (rare)
+
+LEGEND:
+├── ASK HUMAN → need_human = True
+├── TRY TOOL → need_tool = True (with fallback)
+├── TOOL OK → need_tool = True
+├── DIRECT → need_tool = False, need_human = False
+└── VERIFY → Use tool, then double-check with human
+
+
+📊 EXPECTED STATE AFTER EACH STEP
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                         STATE EVOLUTION EXAMPLE                                      │
+│                   example -  Query: "1002 divided by" (incomplete)                            │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+STEP 0 (INITIAL):
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ user_query: "1002 divided by"                                                       │
+│ step_count: 0 | max_steps: 10 | confidence: 0.0                                    │
+│ need_tool: False | need_human: False                                               │
+│ history: []                                                                         │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+STEP 1 (AFTER THINK - LOW CONFIDENCE):
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ current_thought: "Missing divisor, need clarification"                             │
+│ confidence: 0.3 | need_human: True                                                 │
+│ human_question: "What number would you like to divide 1002 by?"                    │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+STEP 2 (AFTER HUMAN RESPONSE):
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ human_response: "20"                                                               │
+│ step_count: 1                                                                       │
+│ history: [{step:1, type:"human", question:"...", response:"20"}]                   │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+STEP 3 (AFTER THINK - HIGH CONFIDENCE):
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ current_thought: "Now calculate 1002/20"                                           │
+│ confidence: 0.9 | need_tool: True                                                  │
+│ selected_tool: "calculator_tool" | tool_input: "1002 / 20"                         │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+STEP 4 (AFTER TOOL EXECUTION):
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ tool_output: "50.1"                                                                │
+│ step_count: 2                                                                       │
+│ history: [..., {step:2, type:"tool", tool:"calculator", output:"50.1"}]            │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+STEP 5 (FINAL - READY TO ANSWER):
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ need_tool: False | need_human: False                                               │
+│ final_answer: "1002 divided by 20 is 50.1"                                         │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                         RETRY STRATEGY HIERARCHY                                     │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+                    ┌─────────────────────────────────────────┐
+                    │         TOOL FAILURE DETECTED           │
+                    │  retry_count = 0                        │
+                    └────────────────────┬────────────────────┘
+                                         │
+                                         ▼
+                    ┌─────────────────────────────────────────┐
+                    │  RETRY STRATEGY BASED ON retry_count    │
+                    └────────────────────┬────────────────────┘
+                                         │
+         ┌───────────────────────────────┼───────────────────────────────┐
+         │                               │                               │
+         ▼                               ▼                               ▼
+┌─────────────────┐             ┌─────────────────┐             ┌─────────────────┐
+│  retry_count    │             │  retry_count    │             │  retry_count    │
+│  = 0            │             │  = 1            │             │  = 2            │
+├─────────────────┤             ├─────────────────┤             ├─────────────────┤
+│                 │             │                 │             │                 │
+│  RETRY WITH     │             │  SWITCH TOOL    │             │  MODIFY INPUT   │
+│  SAME TOOL      │             │  STRATEGY       │             │  STRATEGY       │
+│                 │             │                 │             │                 │
+│  • Same input   │             │  • Try different│             │  • Rephrase     │
+│  • Same tool    │             │    tool         │             │  • Break down   │
+│                 │             │  • Different    │             │    query        │
+│                 │             │    approach     │             │                 │
+└────────┬────────┘             └────────┬────────┘             └────────┬────────┘
+         │                               │                               │
+         └───────────────────────────────┼───────────────────────────────┘
+                                         │
+                                         ▼
+                    ┌─────────────────────────────────────────┐
+                    │  retry_count >= 3                        │
+                    │  → ASK HUMAN (last resort)               │
+                    │  → Set need_human = True                 │
+                    │  → human_question = "I've tried multiple │
+                    │     approaches. Could you help?"         │
+                    └─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                         OBSERVATION LAYER                                            │
+│                    (Separate from Think/Act)                                        │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────────────────────────────────────┐
+    │                         WHAT IS OBSERVATION?                                 │
+    │                                                                              │
+    │  Observation = The RESULT of an Action (Tool or Human)                      │
+    │                                                                              │
+    │  It's NOT just "tool output" - it's STRUCTURED feedback that:               │
+    │  • Tells the agent what happened                                            │
+    │  • Indicates success/failure                                                │
+    │  • Provides context for next thought                                        │
+    └─────────────────────────────────────────────────────────────────────────────┘
+
+
+    FLOW WITH OBSERVATION LAYER:
+    ═══════════════════════════════════════════════════════════════════════════════
+
+        ┌─────────────┐
+        │   THINK     │
+        │  (Reason)   │
+        └──────┬──────┘
+               │
+               ▼
+        ┌─────────────┐
+        │   ACTION    │
+        │ (Tool/Human)│
+        └──────┬──────┘
+               │
+               ▼
+        ┌─────────────────────────────────────────────────────────────────────┐
+        │                      OBSERVATION LAYER                              │
+        │                                                                      │
+        │  ┌─────────────────────────────────────────────────────────────┐   │
+        │  │  OBSERVATION = {                                            │   │
+        │  │      "step": step_count,                                    │   │
+        │  │      "type": "tool_success" | "tool_failure" | "human",    │   │
+        │  │      "content": actual_output,                              │   │
+        │  │      "error": error_message (if any),                       │   │
+        │  │      "confidence_delta": +0.1 or -0.2,                      │   │
+        │  │      "requires_retry": True/False,                          │   │
+        │  │      "next_strategy": "retry" | "switch" | "human"          │   │
+        │  │  }                                                          │   │
+        │  └─────────────────────────────────────────────────────────────┘   │
+        └──────┬──────────────────────────────────────────────────────────────┘
+               │
+               ▼
+        ┌─────────────┐
+        │   THINK     │
+        │  (again)    │
+        └─────────────┘
+
+
+    EXAMPLE OBSERVATION:
+    ═══════════════════════════════════════════════════════════════════════════════
+
+    After calculator_tool("1002 / 20") → "50.1"
+
+    OBSERVATION = {
+        "step": 2,
+        "type": "tool_success",
+        "content": "50.1",
+        "error": None,
+        "confidence_delta": +0.1,
+        "requires_retry": False,
+        "next_strategy": None
+    }
+
+    After search_tool("Michael Jackson") → CAPTCHA
+
+    OBSERVATION = {
+        "step": 1,
+        "type": "tool_failure",
+        "content": "CAPTCHA blocked",
+        "error": "bot_detection",
+        "confidence_delta": -0.2,
+        "requires_retry": True,
+        "next_strategy": "switch"
+    }
+
+project_3.5/
+│
+├── main.py
+├── state.py                    # Updated with observation fields
+├── router.py                   # Confidence + context matrix
+├── local_llm.py
+│
+├── nodes/
+│   ├── think_node.py           # Uses observation layer
+│   ├── tool_node.py            # Returns structured observation
+│   ├── human_node.py           # Returns structured observation
+│   ├── observation_node.py     # NEW! Processes observations
+│   └── final_node.py
+│
+├── tools/
+│   ├── calculator_tool.py
+│   └── search_tool.py
+│
+├── prompts/
+│   └── think_prompt.py         # Includes observation context
+│
+└── utils/
+    ├── retry_strategy.py       # NEW! Retry logic
+    └── confidence.py           # NEW! Confidence calculation
+
+
+✔ Reasoning Layer
+
+* THINK node
+* confidence logic
+
+✔ Action Layer
+
+* TOOL node
+* HUMAN node
+
+✔ Feedback Layer (NEW — very strong)
+
+* OBSERVATION layer
+
+✔ Control Layer
+
+* retry strategy
+* router
+* termination conditions
+
+Before:
+tool_output → directly used
+Now:
+Nowtool_output → observation → reasoning → next decision
